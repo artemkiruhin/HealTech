@@ -1,0 +1,90 @@
+# OS-generated files #
+######################
+.DS_Store
+Thumbs.db
+
+# User-specific files #
+#######################
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Auto-generated files #
+########################
+*.log
+*.tlog
+*.vspscc
+.vscode/
+.vs/
+
+# Build folders #
+#################
+bin/
+obj/
+
+# ASP.NET files #
+#################
+node_modules/
+bower_components/
+wwwroot/lib/
+
+# Azure folders #
+#################
+.terraform/
+.aws-sam/
+
+# Windows image file caches #
+#############################
+[Bb]ackup*/
+[Dd]ebug*/
+[Rr]elease*/
+[Dd]ebugPublic*/
+[Rr]eleasePublic*/
+ipch/
+obj/
+[Aa]pp_Data/
+
+# Visual Studio Code #
+######################
+.history/
+.vscode/settings.json
+
+# Rider project files #
+#######################
+.idea/
+
+# Database files #
+##################
+*.mdf
+*.ldf
+*.ndf
+
+# Entity Framework Core #
+#########################
+*.db
+
+# Testing #
+###########
+TestResults/
+.trx
+.coverage
+*.coverage
+.coveragexml
+
+# Visual Studio profiler #
+##########################
+*.psess
+*.vspx
+*.vsp
+
+# Microsoft Azure Notebooks #
+#############################
+.project/
+
+# Python Virtual Environments #
+###############################
+.venv/
+env/
+venv/
