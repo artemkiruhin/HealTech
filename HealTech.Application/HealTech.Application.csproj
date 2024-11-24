@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Autharization\" />
       <Folder Include="EntityServices\" />
       <Folder Include="HashServices\" />
       <Folder Include="Mappers\" />
