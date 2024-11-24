@@ -8,12 +8,15 @@
 
     <ItemGroup>
       <Folder Include="EntityServices\" />
-      <Folder Include="Mappers\" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\HealTech.Core\HealTech.Core.csproj" />
       <ProjectReference Include="..\HealTech.DataAccess\HealTech.DataAccess.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     </ItemGroup>
 
 </Project>
