@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealTech.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class OrderDetailsToOrderChanged : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,8 +15,8 @@ namespace HealTech.DataAccess.Migrations
                 name: "ProductCategories",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -27,13 +27,13 @@ namespace HealTech.DataAccess.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Surname = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    Role = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,10 +44,11 @@ namespace HealTech.DataAccess.Migrations
                 name: "Products",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,12 +65,12 @@ namespace HealTech.DataAccess.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Registered = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TaxNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Registered = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TaxNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Address = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,10 +87,10 @@ namespace HealTech.DataAccess.Migrations
                 name: "Employees",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Hired = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsAdmin = table.Column<bool>(type: "bit", nullable: false),
-                    Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Hired = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
+                    Salary = table.Column<decimal>(type: "numeric(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -106,11 +107,12 @@ namespace HealTech.DataAccess.Migrations
                 name: "Orders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -133,8 +135,7 @@ namespace HealTech.DataAccess.Migrations
                 name: "IX_Customers_Email",
                 table: "Customers",
                 column: "Email",
-                unique: true,
-                filter: "[Email] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_CustomerId",

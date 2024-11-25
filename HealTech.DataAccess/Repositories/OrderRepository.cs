@@ -6,7 +6,7 @@ namespace HealTech.DataAccess.Repositories;
 
 public class OrderRepository : BaseRepository<Order>, IOrderRepository
 {
-    public OrderRepository(DbContext context) : base(context) { }
+    public OrderRepository(AppDbContext context) : base(context) { }
 
     public async Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(Guid customerId)
     {

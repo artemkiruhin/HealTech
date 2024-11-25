@@ -29,9 +29,9 @@ namespace HealTech.API.Controllers
                 var token = await _authService.Login(model.Username, _hasher.ComputeHash(model.Password));
                 return Ok(token);
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -41,6 +41,20 @@ namespace HealTech.API.Controllers
             try
             {
                 await _customerService.Register(model.FirstName, model.Surname, model.Username, _hasher.ComputeHash(model.Password), model.TaxNumber, model.Email, model.Phone, model.Address);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("test")]
+        public async Task<IActionResult> Test()
+        {
+            try
+            {
+                await _customerService.Register("Artem", "Kiruhin", "user", _hasher.ComputeHash("root"), "skjdhfb", "artem110805@mail.ru", "92938743245", "siuhfsljdnf");
                 return Ok();
             }
             catch

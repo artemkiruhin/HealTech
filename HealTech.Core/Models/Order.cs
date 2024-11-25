@@ -3,7 +3,7 @@
 public class Order
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public DateTime Created { get; set; } = DateTime.Now;
+    public DateTime Created { get; set; } = DateTime.UtcNow;
     public Guid CustomerId { get; set; }
     public decimal TotalPrice { get; set; }
     public Guid ProductId { get; set; }

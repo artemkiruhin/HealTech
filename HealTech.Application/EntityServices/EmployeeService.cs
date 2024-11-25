@@ -32,7 +32,7 @@ public class EmployeeService : IEmployeeService
             IsAdmin = isAdmin,
             IsActive = isActive,
             Role = nameof(UserRole.Employee),
-            Hired = DateTime.Now
+            Hired = DateTime.UtcNow
         });
     }
 

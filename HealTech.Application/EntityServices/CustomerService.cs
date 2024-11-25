@@ -30,12 +30,13 @@ public class CustomerService : ICustomerService
             PasswordHash = passwordHash,
             TaxNumber = taxNumber,
             Address = address,
-            Registered = DateTime.Now,
+            Registered = DateTime.UtcNow,
             IsActive = true,
             Email = email,
             Phone = phone,
             Role = nameof(UserRole.Customer)
         });
+        await _repository.SaveChangesAsync(); // Добавьте этот вызов
     }
 
     public async Task Update(Guid id, string firstname, string surname, string username, string passwordHash, string taxNumber, string email,
@@ -55,6 +56,7 @@ public class CustomerService : ICustomerService
         customer.Phone = phone;
         
         await _repository.UpdateAsync(customer);
+        await _repository.SaveChangesAsync(); // Добавьте этот вызов
     }
 
     public async Task<IEnumerable<Customer>> GetAll()

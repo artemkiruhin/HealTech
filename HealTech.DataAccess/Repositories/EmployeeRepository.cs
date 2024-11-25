@@ -6,7 +6,7 @@ namespace HealTech.DataAccess.Repositories;
 
 public class EmployeeRepository : BaseRepository<Employee>, IEmployeeRepository
 {
-    public EmployeeRepository(DbContext context) : base(context) { }
+    public EmployeeRepository(AppDbContext context) : base(context) { }
 
     public async Task<IEnumerable<Employee>> GetAdminEmployeesAsync()
     {

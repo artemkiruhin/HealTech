@@ -12,15 +12,26 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<ProductCategory> ProductCategories { get; set; } = null!;
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("");
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+    }
+
+    // If you want to keep the old method of configuration, you can use this
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //{
+    //    if (!optionsBuilder.IsConfigured)
+    //    {
+    //        optionsBuilder.UseNpgsql("Server=localhost;Database=healtech_db;Username=postgres;Password=root");
+    //    }
+    //}
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         // User configuration (base class)
-        // Base User configuration
         modelBuilder.Entity<User>(options =>
         {
             options.ToTable("Users");
@@ -33,7 +44,7 @@ public class AppDbContext : DbContext
             options.HasIndex(x => x.Username).IsUnique();
         });
 
-        // Customer-specific properties (mapped to "Customers" table)
+        // Customer-specific properties
         modelBuilder.Entity<Customer>(options =>
         {
             options.ToTable("Customers");
@@ -50,14 +61,15 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // Employee-specific properties (mapped to "Employees" table)
+        // Employee-specific properties
         modelBuilder.Entity<Employee>(options =>
         {
             options.ToTable("Employees");
             options.Property(x => x.Hired).IsRequired();
             options.Property(x => x.IsAdmin).IsRequired();
-            options.Property(x => x.Salary).IsRequired()
-                .HasColumnType("decimal(18,2)");
+            options.Property(x => x.Salary)
+                .IsRequired()
+                .HasColumnType("numeric(18,2)"); // PostgreSQL uses 'numeric' instead of 'decimal'
         });
 
         // Product Category configuration
@@ -67,7 +79,7 @@ public class AppDbContext : DbContext
             options.HasKey(x => x.Id);
             options.Property(x => x.Name).IsRequired().HasMaxLength(100);
             options.HasIndex(x => x.Name).IsUnique();
-            
+
             options.HasMany(x => x.Products)
                 .WithOne(x => x.Category)
                 .HasForeignKey(x => x.CategoryId)
@@ -80,7 +92,7 @@ public class AppDbContext : DbContext
             options.ToTable("Products");
             options.HasKey(x => x.Id);
             options.Property(x => x.Name).IsRequired().HasMaxLength(200);
-            
+
             options.HasMany(x => x.Orders)
                 .WithOne(x => x.Product)
                 .HasForeignKey(x => x.ProductId)
@@ -99,7 +111,6 @@ public class AppDbContext : DbContext
             options.HasOne(x => x.Product)
                 .WithMany(x => x.Orders)
                 .HasForeignKey(x => x.ProductId);
-
         });
     }
 }

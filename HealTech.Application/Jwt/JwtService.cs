@@ -15,14 +15,14 @@ public class JwtService : IJwtService
     private readonly string _audience;
     private readonly string _issuer;
 
-    public JwtService(string key, int expires, string audience, string issuer)
+    public JwtService(JwtSettings jwtSettings)
     {
-        _key = key;
-        _expires = expires;
-        _audience = audience;
-        _issuer = issuer;
+        _key = jwtSettings.SecretKey;
+        _expires = jwtSettings.Expires;
+        _audience = jwtSettings.Audience;
+        _issuer = jwtSettings.Issuer;
     }
-    
+
     public string GenerateJwtToken(Guid id, UserRole role)
     {
         var claims = new Claim[]
@@ -32,7 +32,7 @@ public class JwtService : IJwtService
             new("role", nameof(role))
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(""));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(

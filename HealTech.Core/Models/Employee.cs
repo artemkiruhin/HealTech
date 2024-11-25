@@ -7,7 +7,7 @@ public class Employee : User
         Role = nameof(UserRole.Employee);
     }
     
-    public DateTime Hired { get; set; } = DateTime.Now;
+    public DateTime Hired { get; set; } = DateTime.UtcNow;
     public bool IsAdmin { get; set; }
     public decimal Salary { get; set; }
 }

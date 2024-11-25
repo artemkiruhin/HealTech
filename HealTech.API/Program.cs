@@ -5,9 +5,12 @@ using HealTech.Application.HashServices.Base;
 using HealTech.Application.Jwt;
 using HealTech.Application.Jwt.Base;
 using HealTech.Application.Mappers.AutoMapperService;
+using HealTech.DataAccess;
 using HealTech.DataAccess.Repositories;
 using HealTech.DataAccess.Repositories.Base;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -17,13 +20,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// Настройка параметров JWT
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.AddSingleton<IJwtService>(sp =>
-{
-    var jwtSettings = sp.GetRequiredService<IOptions<JwtSettings>>().Value;
-    return new JwtService(jwtSettings.Key, jwtSettings.Expires, jwtSettings.Audience, jwtSettings.Issuer);
-});
+builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // Регистрация репозиториев и сервисов
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -42,6 +41,12 @@ builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddScoped<IHashService, Sha256HashService>();
 
+builder.Services.AddScoped<IJwtService, JwtService>(sp =>
+{
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+    return new JwtService(jwtSettings);
+});
+
 // Регистрация AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
@@ -54,7 +59,7 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(options =>
 {
     var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-    var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
+    var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -70,15 +75,21 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+// Настройка Swagger
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "HealTech API V1");
+        c.RoutePrefix = string.Empty; // Показать Swagger UI на корневом URL
+    });
 }
 
 app.UseHttpsRedirection();

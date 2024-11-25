@@ -6,7 +6,7 @@ namespace HealTech.DataAccess.Repositories;
 
 public class ProductCategoryRepository : BaseRepository<ProductCategory>, IProductCategoryRepository
 {
-    public ProductCategoryRepository(DbContext context) : base(context) { }
+    public ProductCategoryRepository(AppDbContext context) : base(context) { }
 
     public async Task<ProductCategory?> GetByNameAsync(string name)
     {

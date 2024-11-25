@@ -7,7 +7,7 @@ public class Customer : User
         Role = nameof(UserRole.Customer);
     }
     
-    public DateTime Registered { get; set; } = DateTime.Now;
+    public DateTime Registered { get; set; } = DateTime.UtcNow;
     public required string TaxNumber { get; set; }
     public required string Email { get; set; }
     public required string Phone { get; set; }

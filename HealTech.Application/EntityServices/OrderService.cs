@@ -38,7 +38,7 @@ public class OrderService : IOrderService
             Id = Guid.NewGuid(),
             CustomerId = customerId,
             ProductId = productId,
-            Created = DateTime.Now,
+            Created = DateTime.UtcNow,
             Quantity = quantity,
             TotalPrice = product.Price * quantity
         });

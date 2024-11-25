@@ -6,7 +6,7 @@ namespace HealTech.DataAccess.Repositories;
 
 public class CustomerRepository : BaseRepository<Customer>, ICustomerRepository
 {
-    public CustomerRepository(DbContext context) : base(context) { }
+    public CustomerRepository(AppDbContext context) : base(context) { }
 
     public async Task<Customer?> GetByEmailAsync(string email)
     {
