@@ -27,6 +27,15 @@ namespace HealTech.API.Controllers
             try
             {
                 var token = await _authService.Login(model.Username, _hasher.ComputeHash(model.Password));
+
+                Response.Cookies.Append("jwt", token, new CookieOptions
+                {
+                    Secure = true,
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddHours(10)
+                });
+
                 return Ok(token);
             }
             catch (Exception ex)

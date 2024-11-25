@@ -74,6 +74,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Strict;
+    options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+    options.Secure = CookieSecurePolicy.Always;
+});
+
 builder.Services.AddControllers();
 
 // Настройка Swagger
