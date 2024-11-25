@@ -28,10 +28,7 @@ public class MappingProfile : Profile
         CreateMap<Order, OrderDto>();
         CreateMap<OrderCreateDto, Order>()
             .ForMember(dest => dest.TotalPrice, opt => opt.Ignore());
-
-        CreateMap<OrderDetail, OrderDetailDto>();
-        CreateMap<OrderDetailCreateDto, OrderDetail>()
-            .ForMember(dest => dest.Price, opt => opt.Ignore());
+        
 
         CreateMap<Product, ProductDto>();
         CreateMap<ProductCreateDto, Product>();

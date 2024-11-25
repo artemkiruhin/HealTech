@@ -6,6 +6,7 @@ public class Product
     public required string Name { get; set; }
     public int Quantity { get; set; }
     public Guid CategoryId { get; set; }
+    public decimal Price { get; set; }
 
     
     public virtual ProductCategory Category { get; set; } = null!;

@@ -22,7 +22,7 @@ public class ProductService : IProductService
         _categoryRepository = categoryRepository;
     }
 
-    public async Task Add(string name, int quantity, Guid categoryId)
+    public async Task Add(string name, int quantity, decimal price, Guid categoryId)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(quantity);
         if (!await IsCategoryExists(categoryId)) throw new KeyNotFoundException("This category does not exist");
@@ -31,11 +31,12 @@ public class ProductService : IProductService
             Id = Guid.NewGuid(),
             Name = name,
             Quantity = quantity,
-            CategoryId = categoryId
+            CategoryId = categoryId,
+            Price = price
         });
     }
 
-    public async Task Update(Guid id, string name, int quantity, Guid categoryId)
+    public async Task Update(Guid id, string name, decimal price, int quantity, Guid categoryId)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(quantity);
         if (!await IsCategoryExists(categoryId)) throw new KeyNotFoundException("This category does not exist");
@@ -46,6 +47,34 @@ public class ProductService : IProductService
         product.Name = name;
         product.Quantity = quantity;
         product.CategoryId = categoryId;
+        product.Price = price;
+
+        await _repository.UpdateAsync(product);
+    }
+
+    public async Task UpdateQuantityDecrement(Guid id, int quantityToDecrement)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(quantityToDecrement);
+
+        var product = await _repository.GetByIdAsync(id);
+        if (product is null) throw new KeyNotFoundException("This product does not exist");
+
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(quantityToDecrement, product.Quantity);
+
+        product.Quantity -= quantityToDecrement;
+
+        await _repository.UpdateAsync(product);
+    }
+    public async Task UpdateQuantityIncrement(Guid id, int quantityToIncrement)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(quantityToIncrement);
+
+        var product = await _repository.GetByIdAsync(id);
+        if (product is null) throw new KeyNotFoundException("This product does not exist");
+
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(quantityToIncrement, product.Quantity);
+
+        product.Quantity += quantityToIncrement;
 
         await _repository.UpdateAsync(product);
     }
