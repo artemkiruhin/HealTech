@@ -9,5 +9,5 @@ public class Product
 
     
     public virtual ProductCategory Category { get; set; } = null!;
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }
