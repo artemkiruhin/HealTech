@@ -29,7 +29,7 @@ public class JwtService : IJwtService
         {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Sub, id.ToString()),
-            new("role", nameof(role))
+            new("role",  role  == UserRole.Customer ? nameof(UserRole.Customer) : nameof(UserRole.Employee))
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
