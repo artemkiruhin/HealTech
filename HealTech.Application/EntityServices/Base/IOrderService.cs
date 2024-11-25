@@ -9,4 +9,5 @@ public interface IOrderService
     Task Update(Guid id, Guid customerId, Guid productId, int quantity);
     Task<IEnumerable<Order>> GetAll();
     Task<Order?> GetById(Guid id);
+    Task<List<Order>> GetFilteredOrders(DateTime? created, string? customerUsername, decimal? totalPrice, string? productName, int? quantity);
 }

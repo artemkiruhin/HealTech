@@ -1,6 +1,8 @@
 ﻿using HealTech.Application.EntityServices.Base;
 using HealTech.Core.Models;
+using HealTech.DataAccess.Repositories;
 using HealTech.DataAccess.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealTech.Application.EntityServices;
 
@@ -76,5 +78,33 @@ public class OrderService : IOrderService
     public async Task<Order?> GetById(Guid id)
     {
         return await _repository.GetByIdAsync(id);
+    }
+
+    public async Task<List<Order>> GetFilteredOrders(DateTime? created, string? customerUsername, decimal? totalPrice, string? productName, int? quantity)
+    {
+        var query = _repository.GetAll().AsQueryable();
+
+        if (created.HasValue)
+        {
+            query = query.Where(o => o.Created.Date == created.Value.Date);
+        }
+        if (!string.IsNullOrEmpty(customerUsername))
+        {
+            query = query.Where(o => o.Customer.Username.Contains(customerUsername));
+        }
+        if (totalPrice.HasValue)
+        {
+            query = query.Where(o => o.TotalPrice == totalPrice.Value);
+        }
+        if (!string.IsNullOrEmpty(productName))
+        {
+            query = query.Where(o => o.Product.Name.Contains(productName));
+        }
+        if (quantity.HasValue)
+        {
+            query = query.Where(o => o.Quantity == quantity);
+        }
+
+        return await query.ToListAsync();
     }
 }
