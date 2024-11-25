@@ -1,9 +1,9 @@
-﻿using HealTech.Application.Autharization.Base;
+﻿using HealTech.Application.EntityServices.Base;
 using HealTech.Application.Jwt.Base;
 using HealTech.Core.Models;
 using HealTech.DataAccess.Repositories.Base;
 
-namespace HealTech.Application.Autharization;
+namespace HealTech.Application.EntityServices;
 
 public class AuthService : IAuthService
 {
@@ -15,24 +15,20 @@ public class AuthService : IAuthService
         _jwtService = jwtService;
         _authRepository = authRepository;
     }
-
+    
     public async Task<string> Login(string username, string passwordHash)
     {
         var user = await _authRepository.GetUserByUsername(username);
+        if (user is null) throw new KeyNotFoundException("This user is not exist");
+        if (user.PasswordHash != passwordHash) throw new KeyNotFoundException("Invalid username or password");
 
-        if (user is null) throw new KeyNotFoundException("");
-        
-        var userRole = user.Role switch
+        var token = user.Role switch
         {
-            nameof(UserRole.Customer) => UserRole.Customer,
-            nameof(UserRole.Employee) => UserRole.Employee,
-            _ => throw new ArgumentOutOfRangeException()
+            nameof(UserRole.Employee) => _jwtService.GenerateJwtToken(user.Id, UserRole.Employee),
+            nameof(UserRole.Customer) => _jwtService.GenerateJwtToken(user.Id, UserRole.Customer),
+            _ => throw new KeyNotFoundException("Invalid username or password")
         };
 
-        var token = _jwtService.GenerateJwtToken(user.Id, userRole);
-
         return token;
-
     }
-    
 }

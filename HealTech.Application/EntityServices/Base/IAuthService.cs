@@ -1,4 +1,4 @@
-﻿namespace HealTech.Application.Autharization.Base;
+﻿namespace HealTech.Application.EntityServices.Base;
 
 public interface IAuthService
 {

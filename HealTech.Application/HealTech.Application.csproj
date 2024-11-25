@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="EntityServices\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\HealTech.Core\HealTech.Core.csproj" />
       <ProjectReference Include="..\HealTech.DataAccess\HealTech.DataAccess.csproj" />
     </ItemGroup>
