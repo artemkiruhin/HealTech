@@ -1,6 +1,7 @@
 ﻿using HealTech.Application.EntityServices.Base;
 using HealTech.Core.Models;
 using HealTech.DataAccess.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealTech.Application.EntityServices;
 
@@ -78,6 +79,30 @@ public class ProductService : IProductService
 
         await _repository.UpdateAsync(product);
     }
+
+    public async Task<IEnumerable<Product>> GetByFilter(string? name, int? quantity, string? categoryName, decimal? price)
+    {
+        var query = _repository.GetAll().AsQueryable();
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            query = query.Where(p => p.Name.Contains(name));
+        }
+        if (quantity.HasValue)
+        {
+            query = query.Where(p => p.Quantity == quantity.Value);
+        }
+        if ((!string.IsNullOrEmpty(categoryName)))
+        {
+            query = query.Where(p => p.Category.Name.Contains(categoryName));
+        }
+        if (price.HasValue)
+        {
+            query = query.Where(p => p.Price == price.Value);
+        }
+        
+        return await query.ToListAsync();
+    } 
 
     public async Task<IEnumerable<Product>> GetAll()
     {
