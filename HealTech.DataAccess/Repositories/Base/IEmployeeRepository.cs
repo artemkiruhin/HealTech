@@ -7,4 +7,5 @@ public interface IEmployeeRepository : IRepository<Employee>
 {
     Task<IEnumerable<Employee>> GetAdminEmployeesAsync();
     Task<IEnumerable<Employee>> GetActiveEmployeesAsync();
+    IEnumerable<Employee> GetAll();
 }

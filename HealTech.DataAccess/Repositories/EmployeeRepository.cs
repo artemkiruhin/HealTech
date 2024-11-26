@@ -17,4 +17,6 @@ public class EmployeeRepository : BaseRepository<Employee>, IEmployeeRepository
     {
         return await _dbSet.Where(e => e.IsActive).ToListAsync();
     }
+
+    public IEnumerable<Employee> GetAll() => _dbSet.ToList();   
 }
