@@ -8,32 +8,33 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        // Customer mappings
-        CreateMap<Customer, CustomerDto>();
-        CreateMap<CustomerCreateDto, Customer>()
-            .ForMember(dest => dest.PasswordHash, 
-                opt => opt.MapFrom<PasswordHashResolver>())
-            .ForMember(dest => dest.Role, 
-                opt => opt.MapFrom(src => nameof(UserRole.Customer)));
+        // User -> UserDto
+        CreateMap<User, UserDto>();
 
-        // Employee mappings
+        // Employee -> EmployeeDto
         CreateMap<Employee, EmployeeDto>();
-        CreateMap<EmployeeCreateDto, Employee>()
-            .ForMember(dest => dest.PasswordHash, 
-                opt => opt.MapFrom<PasswordHashResolver>())
-            .ForMember(dest => dest.Role, 
-                opt => opt.MapFrom(src => nameof(UserRole.Employee)));
 
-        // Остальные маппинги остаются без изменений
-        CreateMap<Order, OrderDto>();
-        CreateMap<OrderCreateDto, Order>()
-            .ForMember(dest => dest.TotalPrice, opt => opt.Ignore());
-        
+        // Customer -> CustomerDto
+        CreateMap<Customer, CustomerDto>();
 
-        CreateMap<Product, ProductDto>();
-        CreateMap<ProductCreateDto, Product>();
+        // ProductCategory -> ProductCategoryDto
+        CreateMap<ProductCategory, ProductCategoryDto>()
+            .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products));
 
-        CreateMap<ProductCategory, ProductCategoryDto>();
-        CreateMap<ProductCategoryCreateDto, ProductCategory>();
+        // Product -> ProductDto
+        CreateMap<Product, ProductDto>()
+            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty));
+
+        // Order -> OrderDto
+        CreateMap<Order, OrderDto>()
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null
+                ? $"{src.Customer.FirstName} {src.Customer.Surname}"
+                : "Unknown"))
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null
+                ? src.Product.Name
+                : "Unknown"));
+            //.ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.Product != null
+            //    ? src.Product.Price
+            //    : 0m));
     }
 }

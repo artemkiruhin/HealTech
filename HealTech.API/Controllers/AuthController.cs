@@ -1,6 +1,7 @@
 ﻿using HealTech.API.RequestModels;
 using HealTech.Application.EntityServices.Base;
 using HealTech.Application.HashServices.Base;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +43,14 @@ namespace HealTech.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("jwt");
+            return Ok();
         }
 
         [HttpPost("register")]

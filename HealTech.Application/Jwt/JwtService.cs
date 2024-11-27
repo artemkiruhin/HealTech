@@ -28,7 +28,7 @@ public class JwtService : IJwtService
         var claims = new Claim[]
         {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Sub, id.ToString()),
+            new(ClaimTypes.NameIdentifier, id.ToString()),
             new("role",  role  == UserRole.Customer ? nameof(UserRole.Customer) : nameof(UserRole.Employee))
         };
 
@@ -52,10 +52,8 @@ public class JwtService : IJwtService
         {
             return null;
         }
-
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_key);
-
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -67,24 +65,32 @@ public class JwtService : IJwtService
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ClockSkew = TimeSpan.Zero
         };
-
         try
         {
             var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-            if (validatedToken is JwtSecurityToken jwtToken && jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            // Логирование для отладки
+            Console.WriteLine($"Token validated successfully. Expires: {validatedToken.ValidTo}");
+
+            if (validatedToken is JwtSecurityToken jwtToken &&
+                jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
                 return principal;
             }
         }
-        catch (Exception)
+        catch (SecurityTokenExpiredException ex)
         {
-            
+            Console.WriteLine($"Token expired: {ex.Message}");
+            return null;
         }
-
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Token validation error: {ex.Message}");
+            return null;
+        }
         return null;
     }
-    
+
     public (Guid? Id, UserRole? Role) GetIdAndRoleFromClaims(ClaimsPrincipal principal)
     {
         if (principal == null)
@@ -92,7 +98,7 @@ public class JwtService : IJwtService
             return (null, null);
         }
         
-        var idClaim = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var idClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         Guid? id = idClaim != null ? Guid.Parse(idClaim) : null;
         
         var role = principal.FindFirst("role")?.Value;

@@ -35,9 +35,9 @@ namespace HealTech.API.Controllers
                 var dtos = products.Select(x => _mapper.Map<ProductDto>(x)).ToList();
                 return Ok(dtos);
             } 
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -63,19 +63,6 @@ namespace HealTech.API.Controllers
         {
             try
             {
-                string jwtToken = HttpContext.Request.Cookies["jwtToken"];
-
-                if (string.IsNullOrEmpty(jwtToken))
-                {
-                    return Unauthorized("Пользователь не авторизован: токен отсутствует.");
-                }
-
-                var (id, role) = _jwtService.GetIdAndRoleFromClaims(_jwtService.ValidateToken(jwtToken));
-
-                if (id == null)
-                {
-                    return Unauthorized("Пользователь не авторизован");
-                }
 
                 await _productService.Update(request.Id, request.Name, request.Price, request.Quantity, request.CategoryId);
                 return Ok("Заказ успешно изменен");

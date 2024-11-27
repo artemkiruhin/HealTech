@@ -2,10 +2,13 @@
 using HealTech.API.RequestModels;
 using HealTech.Application.Dto;
 using HealTech.Application.EntityServices.Base;
+using HealTech.Application.Jwt;
 using HealTech.Application.Jwt.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace HealTech.API.Controllers
 {
@@ -65,30 +68,34 @@ namespace HealTech.API.Controllers
 
         [HttpPost("update")]
         [Authorize]
-        public async Task<IActionResult> Update([FromBody] Guid categoryId, [FromBody] string name)
+        public async Task<IActionResult> Update(Guid categoryId, string name)
         {
             try
             {
-                string jwtToken = HttpContext.Request.Cookies["jwtToken"];
+                // Получаем идентификатор пользователя напрямую из Claims
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                if (string.IsNullOrEmpty(jwtToken))
+                foreach (var c in User.Claims)
                 {
-                    return Unauthorized("Пользователь не авторизован: токен отсутствует.");
+                    Console.WriteLine($"{c.Type} - {c.Value}" );
                 }
 
-                var (id, role) = _jwtService.GetIdAndRoleFromClaims(_jwtService.ValidateToken(jwtToken));
 
-                if (id == null)
+                if (string.IsNullOrEmpty(userId))
                 {
                     return Unauthorized("Пользователь не авторизован");
                 }
 
+                Guid parsedUserId = Guid.Parse(userId);
+
                 await _service.Update(categoryId, name);
                 return Ok("Заказ успешно изменен");
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest("Не удалось изменить категорию");
+                // Логируем полную ошибку
+                Console.WriteLine($"Update error: {ex}");
+                return BadRequest($"Не удалось изменить категорию: {ex.Message}");
             }
         }
 

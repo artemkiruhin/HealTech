@@ -1,8 +1,10 @@
-﻿namespace HealTech.Application.Dto;
-
-public class ProductCategoryDto
+﻿namespace HealTech.Application.Dto
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    public ICollection<ProductDto> Products { get; set; } = new List<ProductDto>();
+    public class ProductCategoryDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = null!;
+        public List<ProductDto> Products { get; set; } = new();
+    }
+
 }

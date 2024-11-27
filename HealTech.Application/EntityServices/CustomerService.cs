@@ -1,6 +1,8 @@
 ﻿using HealTech.Application.EntityServices.Base;
 using HealTech.Core.Models;
 using HealTech.DataAccess.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace HealTech.Application.EntityServices;
 
@@ -68,6 +70,50 @@ public class CustomerService : ICustomerService
     {
         return await _repository.GetByIdAsync(id);
     }
-    
-    
+
+    public async Task<IEnumerable<Customer>> GetByFilter(string? username, DateTime? registered, string? email, string? phone, string? address, string? taxNumber, string? firstname, string? surname, bool? isActive)
+    {
+        var query = _repository.GetAll();
+
+        if (!string.IsNullOrEmpty(username))
+        {
+            query = query.Where(c => c.Username.Contains(username));
+        }
+        if (!string.IsNullOrEmpty(firstname))
+        {
+            query = query.Where(c => c.FirstName.Contains(firstname));
+        }
+        if (!string.IsNullOrEmpty(surname))
+        {
+            query = query.Where(c => c.Surname.Contains(surname));
+        }
+        if (!string.IsNullOrEmpty(address))
+        {
+            query = query.Where(c => c.Address.Contains(address));
+        }
+        if (!string.IsNullOrEmpty(taxNumber))
+        {
+            query = query.Where(c => c.TaxNumber.Contains(taxNumber));
+        }
+        if (!string.IsNullOrEmpty(email))
+        {
+            query = query.Where(c => c.Email.Contains(email));
+        }
+        if (!string.IsNullOrEmpty(phone))
+        {
+            query = query.Where(c => c.Phone.Contains(phone));
+        }
+        if (registered.HasValue)
+        {
+            query = query.Where(c => c.Registered.Date == registered.Value.Date);
+        }
+        if (isActive.HasValue)
+        {
+            query = query.Where(c => c.IsActive == isActive.Value);
+        }
+
+        return await query.ToListAsync();
+    }
+
+
 }

@@ -39,50 +39,70 @@ public class ProductService : IProductService
 
     public async Task Update(Guid id, string name, decimal price, int quantity, Guid categoryId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(quantity);
-        if (!await IsCategoryExists(categoryId)) throw new KeyNotFoundException("This category does not exist");
-        var product = await _repository.GetByIdAsync(id);
+        // Validate input parameters
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentOutOfRangeException.ThrowIfNegative(price, nameof(price));
+        ArgumentOutOfRangeException.ThrowIfNegative(quantity, nameof(quantity));
 
-        if (product is null) throw new KeyNotFoundException("This product does not exist");
-        
+        // Check if category exists
+        var category = await _repository.GetByCategoryIdAsync(categoryId);
+        if (category == null)
+            throw new Exception($"Category with ID {categoryId} not found.");
+
+        // Retrieve the existing product
+        var product = await _repository.GetByIdAsync(id)
+            ?? throw new Exception($"Product with ID {id} not found.");
+
+        // Update product properties
         product.Name = name;
+        product.Price = price;
         product.Quantity = quantity;
         product.CategoryId = categoryId;
-        product.Price = price;
 
+        // Save changes
         await _repository.UpdateAsync(product);
     }
 
-    public async Task UpdateQuantityDecrement(Guid id, int quantityToDecrement)
+    public async Task UpdateQuantityDecrement(Guid productId, int quantityToDecrement)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(quantityToDecrement);
+        // Validate input
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantityToDecrement, nameof(quantityToDecrement));
 
-        var product = await _repository.GetByIdAsync(id);
-        if (product is null) throw new KeyNotFoundException("This product does not exist");
+        // Retrieve the product
+        var product = await _repository.GetByIdAsync(productId)
+            ?? throw new Exception($"Product with ID {productId} not found.");
 
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(quantityToDecrement, product.Quantity);
+        // Ensure sufficient quantity
+        if (quantityToDecrement > product.Quantity)
+            throw new InvalidOperationException("Insufficient product quantity for decrement.");
 
+        // Decrement quantity
         product.Quantity -= quantityToDecrement;
 
+        // Save changes
         await _repository.UpdateAsync(product);
     }
-    public async Task UpdateQuantityIncrement(Guid id, int quantityToIncrement)
+
+    public async Task UpdateQuantityIncrement(Guid productId, int quantityToIncrement)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(quantityToIncrement);
+        // Validate input
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantityToIncrement, nameof(quantityToIncrement));
 
-        var product = await _repository.GetByIdAsync(id);
-        if (product is null) throw new KeyNotFoundException("This product does not exist");
+        // Retrieve the product
+        var product = await _repository.GetByIdAsync(productId)
+            ?? throw new Exception($"Product with ID {productId} not found.");
 
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(quantityToIncrement, product.Quantity);
-
+        // Increment quantity
         product.Quantity += quantityToIncrement;
 
+        // Save changes
         await _repository.UpdateAsync(product);
     }
+
 
     public async Task<IEnumerable<Product>> GetByFilter(string? name, int? quantity, string? categoryName, decimal? price)
     {
-        var query = _repository.GetAll().AsQueryable();
+        var query = _repository.GetAll();
 
         if (!string.IsNullOrEmpty(name))
         {

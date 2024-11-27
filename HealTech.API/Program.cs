@@ -70,7 +70,33 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings.Issuer,
         ValidAudience = jwtSettings.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ClockSkew = TimeSpan.Zero // Установка нулевой задержки, чтобы токен истекал точно по времени
+        ClockSkew = TimeSpan.Zero
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            // Попытка получить токен из куки
+            context.Token = context.Request.Cookies["jwt"];
+
+            // Если не нашли в куки, пробуем из заголовка Authorization
+            if (string.IsNullOrEmpty(context.Token))
+            {
+                var authorization = context.Request.Headers["Authorization"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer "))
+                {
+                    context.Token = authorization.Substring("Bearer ".Length).Trim();
+                }
+            }
+
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = context =>
+        {
+            // Логирование ошибок аутентификации
+            Console.WriteLine($"Authentication failed: {context.Exception}");
+            return Task.CompletedTask;
+        }
     };
 });
 

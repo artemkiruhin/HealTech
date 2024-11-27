@@ -8,4 +8,5 @@ public interface ICustomerRepository : IRepository<Customer>
     Task<Customer?> GetByEmailAsync(string email);
     Task<Customer?> GetByTaxNumberAsync(string taxNumber);
     Task<IEnumerable<Customer>> GetCustomersWithOrdersAsync();
+    IQueryable<Customer> GetAll();
 }

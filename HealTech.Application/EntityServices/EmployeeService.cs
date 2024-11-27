@@ -1,6 +1,8 @@
 ﻿using HealTech.Application.EntityServices.Base;
 using HealTech.Core.Models;
+using HealTech.DataAccess.Repositories;
 using HealTech.DataAccess.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealTech.Application.EntityServices;
 
@@ -60,5 +62,41 @@ public class EmployeeService : IEmployeeService
     public async Task<Employee?> GetById(Guid id)
     {
         return await _repository.GetByIdAsync(id);
+    }
+
+    public async Task<IEnumerable<Employee>> GetByFilter(string? username, DateTime? hired, bool? isAdmin, decimal? salary, string? firstname, string? surname, bool? isActive)
+    {
+        var query = _repository.GetAll().AsQueryable();
+
+        if (!string.IsNullOrEmpty(username))
+        {
+            query = query.Where(x => x.Username.Contains(username));
+        }
+        if (!string.IsNullOrEmpty(firstname))
+        {
+            query = query.Where(x => x.FirstName.Contains(firstname));
+        }
+        if (!string.IsNullOrEmpty(surname))
+        {
+            query = query.Where(x => x.Surname.Contains(surname));
+        }
+        if (hired.HasValue)
+        {
+            query = query.Where(x => x.Hired.Date == hired.Value.Date);
+        }
+        if (isAdmin.HasValue)
+        {
+            query = query.Where(x => x.IsAdmin == isAdmin.Value);
+        }
+        if (isActive.HasValue)
+        {
+            query = query.Where(x => x.IsActive == isActive.Value);
+        }
+        if (salary.HasValue)
+        {
+            query = query.Where(x => x.Salary == salary.Value);
+        }
+
+        return await query.ToListAsync();
     }
 }

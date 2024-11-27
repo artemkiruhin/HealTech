@@ -24,8 +24,8 @@ public class ProductRepository : BaseRepository<Product>, IProductRepository
             .Include(p => p.Category)
             .FirstOrDefaultAsync(p => p.Id == productId);
     }
-    public IEnumerable<Product> GetAll()
+    public IQueryable<Product> GetAll()
     {
-        return _dbSet.ToList();
+        return _dbSet.AsQueryable();
     }
 }

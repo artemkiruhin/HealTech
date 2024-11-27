@@ -6,5 +6,5 @@ namespace HealTech.DataAccess.Repositories.Base;
 public interface IOrderRepository : IRepository<Order>
 {
     Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(Guid customerId);
-    IEnumerable<Order> GetAll();
+    IQueryable<Order> GetAll();
 }

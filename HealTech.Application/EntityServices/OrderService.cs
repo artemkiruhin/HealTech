@@ -44,29 +44,47 @@ public class OrderService : IOrderService
         });
     }
 
-    public async Task Update(Guid id, Guid customerId, Guid productId, int quantity)
+    public async Task Update(Guid orderId, Guid customerId, Guid productId, int quantity)
     {
-        var order = await _repository.GetByIdAsync(id);
-        if (order is null) throw new KeyNotFoundException("This order does not exist");
-        
-        var customer = await _customerRepository.GetByIdAsync(customerId);
-        if (customer is null) throw new KeyNotFoundException("This customer does not exist");
-        
-        var product = await _productRepository.GetByIdAsync(productId);
-        if (product is null) throw new KeyNotFoundException("This product does not exist");
-        
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        // Validate input
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
 
-        var dif = order.Quantity - quantity;
-        
-        if (dif > 0) await _productService.UpdateQuantityDecrement(productId, quantity);
-        else await _productService.UpdateQuantityIncrement(productId, quantity);
-        
+        // Retrieve the order
+        var order = await _repository.GetByIdAsync(orderId)
+            ?? throw new Exception($"Order with ID {orderId} not found.");
+
+        // Validate customer
+        var customer = await _customerRepository.GetByIdAsync(customerId)
+            ?? throw new Exception($"Customer with ID {customerId} not found.");
+
+        // Retrieve the product
+        var product = await _productRepository.GetByIdAsync(productId)
+            ?? throw new Exception($"Product with ID {productId} not found.");
+
+        // Calculate quantity difference
+        var quantityDifference = quantity - order.Quantity;
+
+        // Update product quantity based on difference
+        if (quantityDifference > 0)
+        {
+            // Need to check if sufficient product is available
+            if (quantityDifference > product.Quantity)
+                throw new InvalidOperationException("Insufficient product quantity for order update.");
+
+            await _productService.UpdateQuantityDecrement(productId, quantityDifference);
+        }
+        else if (quantityDifference < 0)
+        {
+            await _productService.UpdateQuantityIncrement(productId, Math.Abs(quantityDifference));
+        }
+
+        // Update order details
         order.CustomerId = customerId;
         order.ProductId = productId;
         order.Quantity = quantity;
         order.TotalPrice = product.Price * quantity;
-        
+
+        // Save changes
         await _repository.UpdateAsync(order);
     }
 
@@ -82,7 +100,7 @@ public class OrderService : IOrderService
 
     public async Task<List<Order>> GetFilteredOrders(DateTime? created, string? customerUsername, decimal? totalPrice, string? productName, int? quantity)
     {
-        var query = _repository.GetAll().AsQueryable();
+        var query = _repository.GetAll();
 
         if (created.HasValue)
         {

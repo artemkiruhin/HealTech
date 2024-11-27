@@ -40,9 +40,9 @@ namespace HealTech.API.Controllers
 
                 return Ok(orders);
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest("Не удалось получить заказы");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -71,32 +71,13 @@ namespace HealTech.API.Controllers
         {
             try
             {
-                string jwtToken = HttpContext.Request.Cookies["jwtToken"];
-
-                if (string.IsNullOrEmpty(jwtToken))
-                {
-                    return Unauthorized("Пользователь не авторизован: токен отсутствует.");
-                }
-
-                var (id, role) = _jwtService.GetIdAndRoleFromClaims(_jwtService.ValidateToken(jwtToken));
-
-                if (id == null)
-                {
-                    return Unauthorized("Пользователь не авторизован");
-                }
-
-                if (id != model.CustomerId)
-                {
-                    return Unauthorized("Несоответствие пользователей");
-                }
-
                 // Обновляем заказ, используя полученные данные из модели
                 await _orderService.Update(model.Id, model.CustomerId, model.ProductId, model.Quantity);
                 return Ok("Заказ успешно изменен");
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest("Не удалось изменить заказ");
+                return BadRequest(ex.Message);
             }
         }
     }

@@ -51,37 +51,6 @@ namespace HealTech.API.Controllers
         {
             try
             {
-                string jwtToken = HttpContext.Request.Cookies["jwtToken"];
-
-                if (string.IsNullOrEmpty(jwtToken))
-                {
-                    return Unauthorized("Пользователь не авторизован: токен отсутствует.");
-                }
-
-                var (id, role) = _jwtService.GetIdAndRoleFromClaims(_jwtService.ValidateToken(jwtToken));
-
-                if (role != UserRole.Employee)
-                {
-                    return Unauthorized("Несоответствие пользователей");
-                }
-
-                if (!id.HasValue)
-                {
-                    return Unauthorized("Пользователь не авторизован");
-                }
-
-                var employee = await _service.GetById(id.Value);
-
-                if (employee == null)
-                {
-                    return NotFound("Сотрудник не найден");
-                }
-
-                if (!employee.IsAdmin)
-                {
-                    return BadRequest("Недостаточно прав для выполнения операции");
-                }
-
                 await _service.Register(request.FirstName, request.Surname, request.Username, _hashService.ComputeHash(request.Password), request.Salary, request.IsAdmin, true);
                 return Ok();
             }
@@ -91,13 +60,14 @@ namespace HealTech.API.Controllers
             }
         }
 
-        [HttpPost("mock-reg")]
-        public async Task<IActionResult> Mock([FromBody] EmployeeRegisterModel request)
+        [HttpGet("id")]
+        [Authorize]
+        public async Task<IActionResult> GetInfo(Guid id)
         {
             try
             {
-                await _service.Register(request.FirstName, request.Surname, request.Username, _hashService.ComputeHash(request.Password), request.Salary, request.IsAdmin, true);
-                return Ok();
+                var employee = await _service.GetById(id);
+                return Ok(_mapper.Map<EmployeeDto>(employee));
             }
             catch
             {

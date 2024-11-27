@@ -22,4 +22,9 @@ public class CustomerRepository : BaseRepository<Customer>, ICustomerRepository
     {
         return await _dbSet.Include(c => c.Orders).ToListAsync();
     }
+
+    public IQueryable<Customer> GetAll()
+    {
+        return _dbSet.AsQueryable();
+    }
 }

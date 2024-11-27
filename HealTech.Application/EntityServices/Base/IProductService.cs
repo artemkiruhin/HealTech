@@ -10,5 +10,5 @@ public interface IProductService
     public Task UpdateQuantityIncrement(Guid id, int quantityToIncrement);
     Task<IEnumerable<Product>> GetAll();
     Task<Product?> GetById(Guid id);
-    Task<IEnumerable<Product>> GetByFilter(string? name, int? quantity, string? categoryName, decimal? price)
+    Task<IEnumerable<Product>> GetByFilter(string? name, int? quantity, string? categoryName, decimal? price);
 }

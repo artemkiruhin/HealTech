@@ -12,5 +12,5 @@ public class OrderRepository : BaseRepository<Order>, IOrderRepository
     {
         return await _dbSet.Where(o => o.CustomerId == customerId).ToListAsync();
     }
-    public IEnumerable<Order> GetAll() => [.. _dbSet];
+    public IQueryable<Order> GetAll() => _dbSet.AsQueryable();
 }
