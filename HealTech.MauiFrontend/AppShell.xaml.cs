@@ -1,6 +1,9 @@
-﻿namespace HealTech.MauiFrontend {
-    public partial class AppShell : Shell {
-        public AppShell() {
+﻿namespace HealTech.MauiFrontend
+{
+    public partial class AppShell : Shell
+    {
+        public AppShell()
+        {
             InitializeComponent();
         }
     }

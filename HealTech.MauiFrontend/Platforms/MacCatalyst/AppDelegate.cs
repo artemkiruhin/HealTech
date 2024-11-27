@@ -1,8 +1,10 @@
 ﻿using Foundation;
 
-namespace HealTech.MauiFrontend {
+namespace HealTech.MauiFrontend
+{
     [Register("AppDelegate")]
-    public class AppDelegate : MauiUIApplicationDelegate {
+    public class AppDelegate : MauiUIApplicationDelegate
+    {
         protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     }
 }
